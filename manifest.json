@@ -1,0 +1,19 @@
+{
+  "name": "Anki Redder",
+  "manifest_version": 3,
+  "version": "0.1",
+  "description": "Turns the page red when you click the icon",
+  "permissions": [
+    "scripting",
+    "contextMenus",
+    "nativeMessaging"
+  ],
+  "host_permissions": [
+    "http://*/",
+    "https://*/"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  }
+}
