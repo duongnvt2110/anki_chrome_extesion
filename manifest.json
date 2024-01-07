@@ -2,8 +2,13 @@
   "name": "Anki Redder",
   "manifest_version": 3,
   "version": "0.1",
-  "description": "Turns the page red when you click the icon",
+  "description": "Anki extension for Chrome",
+  "action": {
+    "default_title": "Option",
+    "default_popup": "popups/popup.html"
+  },
   "permissions": [
+    "storage",
     "scripting",
     "contextMenus",
     "nativeMessaging"

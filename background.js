@@ -19,14 +19,13 @@ const wInfo = {
     'idiomExam': "",
 }
 
-chrome.contextMenus.create({
-    id: "show-icon",
-    title: "show-icon",
-    contexts: ["selection"],
-})
+// Get default deck from storage please set default before use
+var deckName;
+
+initialize()
 
 chrome.contextMenus.onClicked.addListener(async function(info,tab) {
-    if (info.menuItemId === "show-icon") {
+    if (info.menuItemId === "add-word") {
         let newWord = info.selectionText.toLowerCase()
         let wordInfo = await getOxFordInfo(newWord)
         addCard(newWord,wordInfo)
@@ -34,46 +33,33 @@ chrome.contextMenus.onClicked.addListener(async function(info,tab) {
 })
 
 
-async function addNote(){
-    // hcAnki();
-    // var f = await getDeckStats()
-    // deckName = Object.keys(f.result)[0]
-    addCard()
-}
-
-function hcAnki() {
-    fetch("http://localhost:8765",{
-        method: "POST",
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    })
-}
-
-async function getDeckStats() {
-    const body = {
-        "action": "getDeckStats",
-        "version": 6,
-        "params": {
-            "decks": ["Vocab Daily"]
-        }
-    }
-
-    var data = await fetch("http://localhost:8765", {
-           // Adding method type
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    })
-    .catch(function(err) {
-        console.error(err)
+async function getDefaultDeck() {
+    await chrome.storage.sync.get(["defaultDeck"]).then((result) => {
+        console.log(result)
+        deckName = result.defaultDeck
     });
-    var f = await data.json();
-    return f;
-
 }
+
+async function initialize() {
+    await getDefaultDeck()
+    createContext()
+}
+// Create menu context
+function createContext() {
+    chrome.contextMenus.create({
+        id: "add-word",
+        title: "Add word to desk (" +deckName+")",
+        contexts: ["selection"],
+    })
+}
+
+
+// async function addNote(){
+//     // hcAnki();
+//     // var f = await getDeckStats()
+//     // deckName = Object.keys(f.result)[0]
+//     addCard()
+// }
 
 async function addCard(word,wordInfo) {
     let cWord = clozeWord(word)
@@ -83,7 +69,7 @@ async function addCard(word,wordInfo) {
         "params": {
             "notes": [
                 {
-                    "deckName": "Vocab Daily",
+                    "deckName": deckName,
                     "modelName": "1. English new words daily",
                     "fields": {
                         "Word": word,
